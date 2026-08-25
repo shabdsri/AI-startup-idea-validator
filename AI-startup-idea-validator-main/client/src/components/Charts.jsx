@@ -41,7 +41,7 @@ export function ScoreRadarChart({ results }) {
                 label: 'Score',
                 data: Object.values(scores),
                 backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                borderColor: 'rgba(99, 102, 241, 1)',
+                borderColor: 'rgba(99, 103, 241, 1)',
                 borderWidth: 2,
                 pointBackgroundColor: 'rgba(99, 102, 241, 1)',
                 pointBorderColor: '#fff',
