@@ -43,7 +43,7 @@ export function ScoreRadarChart({ results }) {
                 backgroundColor: 'rgba(99, 102, 241, 0.2)',
                 borderColor: 'rgba(99, 103, 241, 1)',
                 borderWidth: 2,
-                pointBackgroundColor: 'rgba(98, 101, 241, 1)',
+                pointBackgroundColor: 'rgba(98, 102, 241, 1)',
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
                 pointHoverBorderColor: 'rgba(99, 102, 241, 1)'
