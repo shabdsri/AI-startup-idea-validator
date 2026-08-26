@@ -77,7 +77,7 @@ export function ScoreRadarChart({ results }) {
     };
 
     return (
-        <div style={{ height: '281px', width: '100%' }}>
+        <div style={{ height: '280px', width: '100%' }}>
             <Radar data={data} options={options} />
         </div>
     );
