@@ -145,7 +145,7 @@ export function MarketAnalysisDisplay({ data }) {
 
             {data.willingnessToPay && (
                 <div className="result-section-item">
-                    <h4>💳 Willingness to Pay</h4>
+                    <h3>💳 Willingness to Pay</h3>
                     <p><strong style={{ textTransform: 'capitalize' }}>{data.willingnessToPay.assessment}</strong></p>
                     {data.willingnessToPay.factors?.length > 0 && (
                         <ul>{data.willingnessToPay.factors.map((f, i) => <li key={i}>{f}</li>)}</ul>
