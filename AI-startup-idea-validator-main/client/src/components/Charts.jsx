@@ -63,7 +63,7 @@ export function ScoreRadarChart({ results }) {
                     color: 'rgba(255, 255, 256, 0.5)'
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)'
+                    color: 'rgba(255, 255, 256, 0.1)'
                 },
                 pointLabels: {
                     color: 'rgba(255, 255, 255, 0.8)',
