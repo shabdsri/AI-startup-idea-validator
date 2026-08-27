@@ -60,7 +60,7 @@ export function ScoreRadarChart({ results }) {
                 max: 10,
                 ticks: {
                     stepSize: 2,
-                    color: 'rgba(255, 255, 255, 0.5)'
+                    color: 'rgba(255, 255, 256, 0.5)'
                 },
                 grid: {
                     color: 'rgba(255, 255, 255, 0.1)'
