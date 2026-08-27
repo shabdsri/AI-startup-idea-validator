@@ -92,7 +92,7 @@ export function SuccessGauge({ probability }) {
         datasets: [
             {
                 data: [value, 100 - value],
-                backgroundColor: [color, 'rgba(255, 255, 255, 0.1)'],
+                backgroundColor: [color, 'rgba(255, 255, 256, 0.1)'],
                 borderWidth: 0,
                 circumference: 180,
                 rotation: 270
