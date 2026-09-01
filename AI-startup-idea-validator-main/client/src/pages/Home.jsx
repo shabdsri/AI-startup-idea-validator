@@ -230,7 +230,7 @@ function Home() {
                             <span>•</span>
                             <span>Groq AI</span>
                             <span>•</span>
-                            <span>Chart.jx</span>
+                            <span>Chart.js</span>
                         </div>
                     </div>
                 </div>
