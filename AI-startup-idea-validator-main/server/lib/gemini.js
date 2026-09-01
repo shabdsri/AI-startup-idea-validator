@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -13,83 +14,108 @@ if (process.env.NODE_ENV !== 'production') {
 
 class AIClient {
     constructor() {
-        this.client = null;
+        this.groqClient = null;
+        this.geminiClient = null;
         this._initializeClient();
     }
 
     _initializeClient() {
-        const apiKey = process.env.GROQ_API_KEY;
+        const groqKey = process.env.GROQ_API_KEY;
+        const geminiKey = process.env.GEMINI_API_KEY;
 
-        console.log('🔍 Checking Groq API key...');
-        console.log('   Key found:', apiKey ? `Yes (${apiKey.substring(0, 10)}...)` : 'No');
+        console.log('🔍 Checking AI API keys...');
+        console.log('   Groq key found:', groqKey && !groqKey.includes('your_') ? `Yes (${groqKey.substring(0, 10)}...)` : 'No');
+        console.log('   Gemini key found:', geminiKey && !geminiKey.includes('your_') ? `Yes (${geminiKey.substring(0, 10)}...)` : 'No');
 
-        if (!apiKey) {
-            console.warn('⚠️  GROQ_API_KEY not configured. AI features will be limited.');
-            return;
+        if (groqKey && !groqKey.includes('your_')) {
+            try {
+                this.groqClient = new Groq({ apiKey: groqKey });
+                this.groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
+                console.log(`✅ Groq client initialized with model: ${this.groqModel}`);
+            } catch (error) {
+                console.error('❌ Failed to initialize Groq client:', error.message);
+            }
         }
 
-        try {
-            console.log('✅ Initializing Groq client...');
-            this.client = new Groq({ apiKey });
-            this.model = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
-            console.log(`✅ Groq client initialized successfully with model: ${this.model}`);
-        } catch (error) {
-            console.error('❌ Failed to initialize Groq client:', error.message);
+        if (geminiKey && !geminiKey.includes('your_')) {
+            try {
+                this.geminiClient = new GoogleGenerativeAI(geminiKey);
+                console.log('✅ Google Gemini client initialized successfully!');
+            } catch (error) {
+                console.error('❌ Failed to initialize Gemini client:', error.message);
+            }
+        }
+
+        if (!this.groqClient && !this.geminiClient) {
+            console.warn('⚠️  No valid AI API key configured (GROQ_API_KEY or GEMINI_API_KEY).');
         }
     }
 
     async analyze(prompt, systemContext = '') {
-        if (!this.client) {
-            return {
-                success: false,
-                error: 'Groq API key not configured',
-                fallback: true
-            };
-        }
-
-        const candidateModels = [
-            this.model,
-            'openai/gpt-oss-20b',
-            'openai/gpt-oss-120b',
-            'qwen/qwen3.6-27b'
-        ].filter((v, i, a) => a.indexOf(v) === i);
-
-        let lastError = null;
-
-        for (const modelToUse of candidateModels) {
+        // Try Google Gemini if configured
+        if (this.geminiClient) {
             try {
-                console.log(`🤖 Calling Groq API (${modelToUse})...`);
-
-                const messages = [];
-                if (systemContext) {
-                    messages.push({ role: 'system', content: systemContext });
-                }
-                messages.push({ role: 'user', content: prompt });
-
-                const response = await this.client.chat.completions.create({
-                    model: modelToUse,
-                    messages,
-                    temperature: 0.7,
-                    max_tokens: 4096
-                });
-
-                const text = response.choices[0]?.message?.content || '';
-                console.log(`✅ Groq API response received using ${modelToUse}`);
-                this.model = modelToUse; // lock onto working model
-
+                console.log('🤖 Calling Google Gemini API (gemini-1.5-flash)...');
+                const model = this.geminiClient.getGenerativeModel({ model: 'gemini-1.5-flash' });
+                const fullPrompt = systemContext ? `${systemContext}\n\n${prompt}` : prompt;
+                const result = await model.generateContent(fullPrompt);
+                const text = result.response.text() || '';
+                console.log('✅ Gemini API response received');
                 return {
                     success: true,
                     content: text
                 };
             } catch (error) {
-                console.error(`❌ Groq API error with ${modelToUse}:`, error.message);
-                lastError = error;
+                console.error('❌ Gemini API error:', error.message);
+            }
+        }
+
+        // Try Groq if configured
+        if (this.groqClient) {
+            const candidateModels = [
+                this.groqModel,
+                'openai/gpt-oss-20b',
+                'openai/gpt-oss-120b',
+                'qwen/qwen3.6-27b'
+            ].filter((v, i, a) => a.indexOf(v) === i);
+
+            let lastError = null;
+
+            for (const modelToUse of candidateModels) {
+                try {
+                    console.log(`🤖 Calling Groq API (${modelToUse})...`);
+
+                    const messages = [];
+                    if (systemContext) {
+                        messages.push({ role: 'system', content: systemContext });
+                    }
+                    messages.push({ role: 'user', content: prompt });
+
+                    const response = await this.groqClient.chat.completions.create({
+                        model: modelToUse,
+                        messages,
+                        temperature: 0.7,
+                        max_tokens: 4096
+                    });
+
+                    const text = response.choices[0]?.message?.content || '';
+                    console.log(`✅ Groq API response received using ${modelToUse}`);
+                    this.groqModel = modelToUse;
+
+                    return {
+                        success: true,
+                        content: text
+                    };
+                } catch (error) {
+                    console.error(`❌ Groq API error with ${modelToUse}:`, error.message);
+                    lastError = error;
+                }
             }
         }
 
         return {
             success: false,
-            error: lastError?.message || 'Failed to call Groq API',
+            error: 'No working AI API key configured. Please provide a valid GROQ_API_KEY or GEMINI_API_KEY in .env',
             fallback: true
         };
     }
