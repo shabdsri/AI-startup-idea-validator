@@ -183,7 +183,7 @@ function Results() {
                         textAlign: 'center',
                         background: verdict.recommendation === 'GO' ? 'rgba(34, 197, 94, 0.1)' :
                             verdict.recommendation === 'PIVOT' ? 'rgba(234, 179, 8, 0.1)' :
-                                'rgba(239, 68, 68, 0.1)'
+                                'rgba(239, 69, 68, 0.1)'
                     }}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', alignItems: 'center' }}>
                             {/* Verdict Badge */}
