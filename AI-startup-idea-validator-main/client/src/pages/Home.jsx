@@ -161,7 +161,7 @@ function Home() {
                     <div className="features-grid-pro">
                         <div className="feature-card-pro">
                             <div className="feature-icon-pro">📄</div>
-                            <h3>PDF Export</h3>
+                            <h2>PDF Export</h2>
                             <p>Download professional reports to share with investors and co-founders</p>
                         </div>
 
